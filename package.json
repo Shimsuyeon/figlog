@@ -1,0 +1,18 @@
+{
+  "name": "figlog",
+  "version": "0.0.0",
+  "private": true,
+  "description": "End-to-end declarative logging pipeline: Figma → JSON spec → build-time injection → runtime auto-collection",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "clean": "pnpm -r run clean",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "keywords": ["logging", "figma", "vite-plugin", "analytics", "declarative"],
+  "license": "MIT",
+  "packageManager": "pnpm@10.6.1",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}

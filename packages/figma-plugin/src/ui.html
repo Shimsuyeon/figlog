@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    color: #333;
+    padding: 16px;
+    background: #fff;
+  }
+  h2 { font-size: 16px; margin-bottom: 16px; color: #18181b; }
+  label { display: block; font-weight: 600; margin-bottom: 4px; margin-top: 12px; }
+  label .optional { font-weight: 400; color: #999; font-size: 11px; }
+  input, select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d4d4d8;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: #6366f1; }
+  .btn-row { display: flex; gap: 8px; margin-top: 20px; }
+  button {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary { background: #6366f1; color: #fff; }
+  .btn-primary:hover { background: #4f46e5; }
+  .btn-secondary { background: #f4f4f5; color: #333; }
+  .btn-secondary:hover { background: #e4e4e7; }
+  .status { margin-top: 12px; font-size: 12px; color: #16a34a; min-height: 18px; }
+  .export-area {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+    max-height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <h2>FigLog</h2>
+
+  <label>Event Type *</label>
+  <select id="eventType">
+    <option value="click">click</option>
+    <option value="view">view</option>
+  </select>
+
+  <label>Event Name *</label>
+  <input id="eventName" placeholder="clickAddToCart" />
+
+  <label>Placement *</label>
+  <input id="placement" placeholder="productList" />
+
+  <label>설명 <span class="optional">(선택)</span></label>
+  <input id="description" placeholder="한국어 메모" />
+
+  <label>구분 <span class="optional">(선택)</span></label>
+  <input id="group" placeholder="그룹 라벨 (export 정리용)" />
+
+  <div class="btn-row">
+    <button class="btn-primary" id="saveBtn">Save Event</button>
+    <button class="btn-secondary" id="exportBtn">Export JSON</button>
+  </div>
+
+  <div class="status" id="status"></div>
+  <pre class="export-area" id="exportArea"></pre>
+
+<script>
+  const $ = (sel) => document.querySelector(sel);
+
+  $('#saveBtn').onclick = () => {
+    const eventName = $('#eventName').value.trim();
+    const placement = $('#placement').value.trim();
+    if (!eventName || !placement) {
+      $('#status').textContent = 'eventName and placement are required.';
+      $('#status').style.color = '#dc2626';
+      return;
+    }
+
+    parent.postMessage({ pluginMessage: {
+      type: 'save-event',
+      payload: {
+        eventType: $('#eventType').value,
+        eventName,
+        placement,
+        description: $('#description').value.trim() || undefined,
+        group: $('#group').value.trim() || undefined,
+      }
+    }}, '*');
+  };
+
+  $('#exportBtn').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'export-spec' }}, '*');
+  };
+
+  onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'saved') {
+      $('#status').style.color = '#16a34a';
+      $('#status').textContent = `Saved to "${msg.nodeName}"`;
+      $('#eventName').value = '';
+    }
+
+    if (msg.type === 'spec-exported') {
+      const json = JSON.stringify(msg.spec, null, 2);
+      $('#exportArea').textContent = json;
+      $('#exportArea').style.display = 'block';
+      $('#status').style.color = '#16a34a';
+      $('#status').textContent = 'Spec exported. Copy the JSON below.';
+    }
+  };
+</script>
+</body>
+</html>

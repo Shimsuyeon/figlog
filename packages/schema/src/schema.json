@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FigLog Spec",
+  "description": "Logging specification exported from Figma plugin",
+  "type": "object",
+  "required": ["domain", "screens"],
+  "properties": {
+    "domain": {
+      "type": "string",
+      "description": "Domain name, e.g. OnlineShop"
+    },
+    "screens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "placement", "events"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Screen name"
+          },
+          "placement": {
+            "type": "string",
+            "description": "Placement identifier"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["eventType", "eventName"],
+              "properties": {
+                "eventType": {
+                  "type": "string",
+                  "enum": ["click", "view"],
+                  "description": "Event type"
+                },
+                "eventName": {
+                  "type": "string",
+                  "description": "Event name identifier"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Human-readable description (Korean memo)"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

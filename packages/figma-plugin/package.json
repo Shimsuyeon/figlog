@@ -1,0 +1,17 @@
+{
+  "name": "@figlog/figma-plugin",
+  "version": "0.1.0",
+  "description": "Figma plugin for DA to mark logging points and export JSON specs",
+  "private": true,
+  "scripts": {
+    "build": "node build.mjs",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.100.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.4.0"
+  },
+  "license": "MIT"
+}
