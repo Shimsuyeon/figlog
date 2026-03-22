@@ -41,6 +41,10 @@
                 "description": {
                   "type": "string",
                   "description": "Human-readable description (Korean memo)"
+                },
+                "actionType": {
+                  "type": "string",
+                  "description": "Optional action type for sheet export"
                 }
               }
             }

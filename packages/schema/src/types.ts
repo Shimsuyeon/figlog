@@ -4,6 +4,7 @@ export interface LogEvent {
   eventType: EventType;
   eventName: string;
   description?: string;
+  actionType?: string;
 }
 
 export interface LogScreen {
