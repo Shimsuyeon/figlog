@@ -6,16 +6,16 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  color: string;
+  image: string;
 }
 
 const products: Product[] = [
-  { id: "headphones", name: "무선 헤드폰", description: "프리미엄 노이즈 캔슬링 헤드폰", price: 129000, color: "#dbeafe" },
-  { id: "phone", name: "스마트폰", description: "최신 5G 스마트폰, 256GB", price: 899000, color: "#fce7f3" },
-  { id: "laptop", name: "노트북", description: "고성능 워크스테이션 노트북", price: 1299000, color: "#dcfce7" },
-  { id: "earbuds", name: "무선 이어버드", description: "프리미엄 사운드, 액티브 노이즈 캔슬링", price: 189000, color: "#fef9c3" },
-  { id: "watch", name: "스마트워치", description: "건강 모니터링 & 피트니스 트래커", price: 449000, color: "#f3e8ff" },
-  { id: "tablet", name: "태블릿", description: "12.9인치 프로 태블릿, 128GB", price: 599000, color: "#ffedd5" },
+  { id: "headphones", name: "무선 헤드폰", description: "프리미엄 노이즈 캔슬링 헤드폰", price: 129000, image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&h=300&fit=crop" },
+  { id: "phone", name: "스마트폰", description: "최신 5G 스마트폰, 256GB", price: 899000, image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&h=300&fit=crop" },
+  { id: "laptop", name: "노트북", description: "고성능 워크스테이션 노트북", price: 1299000, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop" },
+  { id: "earbuds", name: "무선 이어버드", description: "프리미엄 사운드, 액티브 노이즈 캔슬링", price: 189000, image: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?w=400&h=300&fit=crop" },
+  { id: "watch", name: "스마트워치", description: "건강 모니터링 & 피트니스 트래커", price: 449000, image: "https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=400&h=300&fit=crop" },
+  { id: "tablet", name: "태블릿", description: "12.9인치 프로 태블릿, 128GB", price: 599000, image: "https://images.unsplash.com/photo-1561154464-82e6b1c0dbf7?w=400&h=300&fit=crop" },
 ];
 
 const fmt = (n: number) =>
@@ -78,14 +78,8 @@ export function App() {
                 onClick={() => alert(`${product.name} 상세 페이지로 이동`)}
                 style={{ cursor: "pointer" }}
               >
-                <div className="card-image" style={{ ...styles.imagePlaceholder, backgroundColor: product.color }}>
-                  <span style={styles.imageEmoji}>
-                    {product.id === "headphones" ? "🎧" :
-                     product.id === "phone" ? "📱" :
-                     product.id === "laptop" ? "💻" :
-                     product.id === "earbuds" ? "🎵" :
-                     product.id === "watch" ? "⌚" : "📟"}
-                  </span>
+                <div className="card-image" style={styles.imageWrapper}>
+                  <img src={product.image} alt={product.name} style={styles.productImage} />
                 </div>
                 <div style={styles.cardBody}>
                   <h3 style={styles.productName}>{product.name}</h3>
@@ -200,15 +194,15 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: "column",
     transition: "box-shadow 0.2s",
   },
-  imagePlaceholder: {
+  imageWrapper: {
     height: 200,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    overflow: "hidden",
+    backgroundColor: "#f3f4f6",
   },
-  imageEmoji: {
-    fontSize: 48,
-    filter: "grayscale(0.2)",
+  productImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   cardBody: {
     padding: "16px 16px 0",
