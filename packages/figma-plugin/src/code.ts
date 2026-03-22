@@ -8,7 +8,11 @@ interface LogEventData {
   group?: string;
 }
 
-figma.showUI(__html__, { width: 400, height: 520 });
+figma.showUI(__html__, { width: 420, height: 640 });
+
+figma.on("selectionchange", () => {
+  sendSelectionEvents();
+});
 
 figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
   if (msg.type === "save-event") {
@@ -26,6 +30,41 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
 
     figma.notify(`Event "${newEvent.eventName}" saved to ${node.name}`);
     figma.ui.postMessage({ type: "saved", nodeName: node.name });
+    sendSelectionEvents();
+  }
+
+  if (msg.type === "update-event") {
+    const { index, event } = msg.payload as { index: number; event: LogEventData };
+    const selection = figma.currentPage.selection;
+    if (selection.length === 0) return;
+
+    const node = selection[0];
+    const events = getEvents(node);
+    if (index >= 0 && index < events.length) {
+      events[index] = event;
+      node.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(events));
+      figma.notify(`Event "${event.eventName}" updated`);
+      sendSelectionEvents();
+    }
+  }
+
+  if (msg.type === "delete-event") {
+    const { index } = msg.payload as { index: number };
+    const selection = figma.currentPage.selection;
+    if (selection.length === 0) return;
+
+    const node = selection[0];
+    const events = getEvents(node);
+    if (index >= 0 && index < events.length) {
+      const removed = events.splice(index, 1)[0];
+      node.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(events));
+      figma.notify(`Event "${removed.eventName}" deleted`);
+      sendSelectionEvents();
+    }
+  }
+
+  if (msg.type === "request-selection-events") {
+    sendSelectionEvents();
   }
 
   if (msg.type === "export-spec") {
@@ -37,6 +76,17 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
     figma.closePlugin();
   }
 };
+
+function sendSelectionEvents() {
+  const selection = figma.currentPage.selection;
+  if (selection.length === 0) {
+    figma.ui.postMessage({ type: "selection-events", nodeName: null, events: [] });
+    return;
+  }
+  const node = selection[0];
+  const events = getEvents(node);
+  figma.ui.postMessage({ type: "selection-events", nodeName: node.name, events });
+}
 
 function getEvents(node: SceneNode): LogEventData[] {
   const raw = node.getPluginData(PLUGIN_DATA_KEY);
