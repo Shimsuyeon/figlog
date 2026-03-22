@@ -3,313 +3,277 @@
 <head>
 <meta charset="UTF-8" />
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
-    color: #333;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  .tabs {
-    display: flex;
-    border-bottom: 2px solid #e5e7eb;
-    background: #fafafa;
-    flex-shrink: 0;
-  }
-  .tab {
-    flex: 1;
-    padding: 10px 0;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: #999;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .tab:hover { color: #666; }
-  .tab.active { color: #6366f1; border-bottom-color: #6366f1; }
-  .tab-panel {
-    display: none;
-    padding: 16px;
-    flex: 1;
-    overflow-y: auto;
-  }
-  .tab-panel.active { display: block; }
-
-  h3 { font-size: 13px; margin-bottom: 8px; color: #6366f1; font-weight: 600; }
-  label { display: block; font-weight: 600; margin-bottom: 4px; margin-top: 10px; }
-  label .optional { font-weight: 400; color: #999; font-size: 11px; }
-  input, select {
-    width: 100%;
-    padding: 7px 10px;
-    border: 1px solid #d4d4d8;
-    border-radius: 6px;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  input:focus, select:focus { border-color: #6366f1; }
-  .btn-row { display: flex; gap: 8px; margin-top: 16px; }
-  button {
-    flex: 1;
-    padding: 9px 0;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .btn-primary { background: #6366f1; color: #fff; }
-  .btn-primary:hover { background: #4f46e5; }
-  .btn-secondary { background: #f4f4f5; color: #333; }
-  .btn-secondary:hover { background: #e4e4e7; }
-  .btn-danger { background: #fee2e2; color: #dc2626; flex: none; padding: 9px 12px; }
-  .btn-danger:hover { background: #fecaca; }
-  .status { margin-top: 10px; font-size: 12px; color: #16a34a; min-height: 16px; }
-
-  .selection-label { font-size: 11px; color: #666; margin-bottom: 6px; }
-  .event-list { margin-bottom: 4px; }
-  .event-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .event-item:hover { border-color: #6366f1; }
-  .event-item.editing { border-color: #6366f1; background: #eef2ff; }
-  .event-info { flex: 1; min-width: 0; }
-  .event-name { font-weight: 600; font-size: 12px; }
-  .event-meta { font-size: 11px; color: #888; margin-top: 2px; }
-  .event-badge {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-  .badge-click { background: #dbeafe; color: #2563eb; }
-  .badge-view { background: #dcfce7; color: #16a34a; }
-  .no-events { font-size: 12px; color: #999; padding: 12px 0; text-align: center; }
-  .divider { margin: 14px 0; border: none; border-top: 1px solid #e5e7eb; }
-
-  .export-area {
-    padding: 12px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    font-family: 'SF Mono', 'Menlo', monospace;
-    font-size: 11px;
-    max-height: 300px;
-    overflow: auto;
-    white-space: pre-wrap;
-    margin-top: 12px;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #e5e7eb;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab:hover { color: #666; }
+.tab.active { color: #6366f1; border-bottom-color: #6366f1; }
+.tab-panel { display: none; padding: 16px; flex: 1; overflow-y: auto; }
+.tab-panel.active { display: block; }
+h3 { font-size: 13px; margin-bottom: 8px; color: #6366f1; font-weight: 600; }
+label { display: block; font-weight: 600; margin-bottom: 4px; margin-top: 10px; }
+label .optional { font-weight: 400; color: #999; font-size: 11px; }
+input, select {
+  width: 100%; padding: 7px 10px; border: 1px solid #d4d4d8;
+  border-radius: 6px; font-size: 13px; outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus { border-color: #6366f1; }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+button {
+  flex: 1; padding: 9px 0; border: none; border-radius: 6px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary { background: #6366f1; color: #fff; }
+.btn-primary:hover { background: #4f46e5; }
+.btn-secondary { background: #f4f4f5; color: #333; }
+.btn-secondary:hover { background: #e4e4e7; }
+.btn-danger { background: #fee2e2; color: #dc2626; flex: none; padding: 9px 12px; }
+.btn-danger:hover { background: #fecaca; }
+.status { margin-top: 10px; font-size: 12px; color: #16a34a; min-height: 16px; }
+.selection-label { font-size: 11px; color: #666; margin-bottom: 6px; }
+.divider { margin: 14px 0; border: none; border-top: 1px solid #e5e7eb; }
+.layer-group { margin-bottom: 12px; }
+.layer-header {
+  display: flex; align-items: center; gap: 6px; padding: 6px 0;
+  cursor: pointer; font-size: 12px; font-weight: 600; color: #18181b;
+}
+.layer-header:hover { color: #6366f1; }
+.layer-header .layer-icon { color: #999; font-size: 10px; }
+.layer-count { font-size: 11px; color: #999; font-weight: 400; }
+.event-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+  background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;
+  margin-bottom: 4px; margin-left: 16px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.event-item:hover { border-color: #6366f1; }
+.event-info { flex: 1; min-width: 0; }
+.event-name { font-weight: 600; font-size: 12px; }
+.event-meta { font-size: 11px; color: #888; margin-top: 1px; }
+.event-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 6px;
+  border-radius: 4px; flex-shrink: 0;
+}
+.badge-click { background: #dbeafe; color: #2563eb; }
+.badge-view { background: #dcfce7; color: #16a34a; }
+.no-events { font-size: 12px; color: #999; padding: 20px 0; text-align: center; }
+.export-wrapper { position: relative; margin-top: 12px; }
+.export-area {
+  padding: 12px; background: #f9fafb; border: 1px solid #e5e7eb;
+  border-radius: 6px; font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 11px; max-height: 300px; overflow: auto; white-space: pre-wrap;
+}
+.copy-btn {
+  position: absolute; top: 6px; right: 6px; flex: none;
+  padding: 4px 10px; font-size: 11px; font-weight: 600;
+  background: #fff; border: 1px solid #d4d4d8; border-radius: 4px;
+  cursor: pointer; color: #666; transition: background 0.15s, color 0.15s;
+}
+.copy-btn:hover { background: #f4f4f5; color: #333; }
+.copy-btn.copied { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+.total-count { font-size: 11px; color: #999; margin-bottom: 8px; }
 </style>
 </head>
 <body>
 
-  <div class="tabs">
-    <div class="tab active" data-tab="input">Add</div>
-    <div class="tab" data-tab="result">Result<span id="eventCountBadge"></span></div>
+<div class="tabs">
+  <div class="tab active" data-tab="input">Add</div>
+  <div class="tab" data-tab="result">Result<span id="totalBadge"></span></div>
+</div>
+
+<div class="tab-panel active" id="tab-input">
+  <h3 id="formTitle">Add Event</h3>
+  <div class="selection-label" id="inputSelectionLabel">No layer selected</div>
+
+  <label>Event Type *</label>
+  <select id="eventType">
+    <option value="click">click</option>
+    <option value="view">view</option>
+  </select>
+
+  <label>Event Name *</label>
+  <input id="eventName" placeholder="clickAddToCart" />
+
+  <label>Placement *</label>
+  <input id="placement" placeholder="productList" />
+
+  <label>설명 <span class="optional">(선택)</span></label>
+  <input id="description" placeholder="한국어 메모" />
+
+  <label>구분 <span class="optional">(선택)</span></label>
+  <input id="group" placeholder="그룹 라벨 (export 정리용)" />
+
+  <div class="btn-row" id="addBtnRow">
+    <button class="btn-primary" id="saveBtn">Save Event</button>
   </div>
-
-  <!-- Tab 1: Add/Edit form -->
-  <div class="tab-panel active" id="tab-input">
-    <h3 id="formTitle">Add Event</h3>
-    <div class="selection-label" id="inputSelectionLabel">No layer selected</div>
-
-    <label>Event Type *</label>
-    <select id="eventType">
-      <option value="click">click</option>
-      <option value="view">view</option>
-    </select>
-
-    <label>Event Name *</label>
-    <input id="eventName" placeholder="clickAddToCart" />
-
-    <label>Placement *</label>
-    <input id="placement" placeholder="productList" />
-
-    <label>설명 <span class="optional">(선택)</span></label>
-    <input id="description" placeholder="한국어 메모" />
-
-    <label>구분 <span class="optional">(선택)</span></label>
-    <input id="group" placeholder="그룹 라벨 (export 정리용)" />
-
-    <div class="btn-row" id="addBtnRow">
-      <button class="btn-primary" id="saveBtn">Save Event</button>
-    </div>
-
-    <div class="btn-row" id="editBtnRow" style="display:none;">
-      <button class="btn-primary" id="updateBtn">Update</button>
-      <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
-      <button class="btn-danger" id="deleteBtn">Delete</button>
-    </div>
-
-    <div class="status" id="status"></div>
+  <div class="btn-row" id="editBtnRow" style="display:none;">
+    <button class="btn-primary" id="updateBtn">Update</button>
+    <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+    <button class="btn-danger" id="deleteBtn">Delete</button>
   </div>
+  <div class="status" id="status"></div>
+</div>
 
-  <!-- Tab 2: Result (event list + export) -->
-  <div class="tab-panel" id="tab-result">
-    <div class="selection-label" id="resultSelectionLabel">No layer selected</div>
-    <div class="event-list" id="eventList">
-      <div class="no-events">Select a layer to see its events</div>
-    </div>
-
-    <hr class="divider" />
-
-    <div class="btn-row">
-      <button class="btn-primary" id="exportBtn">Export JSON</button>
-    </div>
-    <div id="exportContent"></div>
+<div class="tab-panel" id="tab-result">
+  <div class="total-count" id="totalCount"></div>
+  <div id="allEventList">
+    <div class="no-events">No events marked on this page yet</div>
   </div>
+  <hr class="divider" />
+  <div class="btn-row">
+    <button class="btn-primary" id="exportBtn">Export JSON</button>
+  </div>
+  <div id="exportContent"></div>
+</div>
 
 <script>
-  var $ = function(sel) { return document.querySelector(sel); };
-  var editingIndex = -1;
-  var currentEvents = [];
+var $ = function(sel) { return document.querySelector(sel); };
+var editingNodeId = null;
+var editingIndex = -1;
+var skipNextSelectionReset = false;
+var allGroups = [];
 
-  document.querySelectorAll('.tab').forEach(function(tab) {
-    tab.onclick = function() {
-      document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-      document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-      tab.classList.add('active');
-      $('#tab-' + tab.dataset.tab).classList.add('active');
-    };
-  });
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.onclick = function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    tab.classList.add('active');
+    $('#tab-' + tab.dataset.tab).classList.add('active');
+  };
+});
 
-  parent.postMessage({ pluginMessage: { type: 'request-selection-events' }}, '*');
+parent.postMessage({ pluginMessage: { type: 'request-selection-events' }}, '*');
 
-  $('#saveBtn').onclick = function() {
-    var eventName = $('#eventName').value.trim();
-    var placement = $('#placement').value.trim();
-    if (!eventName || !placement) {
-      showStatus('eventName and placement are required.', true);
-      return;
+$('#saveBtn').onclick = function() {
+  var eventName = $('#eventName').value.trim();
+  var placement = $('#placement').value.trim();
+  if (!eventName || !placement) { showStatus('eventName and placement are required.', true); return; }
+  parent.postMessage({ pluginMessage: {
+    type: 'save-event',
+    payload: {
+      eventType: $('#eventType').value, eventName: eventName, placement: placement,
+      description: $('#description').value.trim() || undefined,
+      group: $('#group').value.trim() || undefined,
     }
-    parent.postMessage({ pluginMessage: {
-      type: 'save-event',
-      payload: {
-        eventType: $('#eventType').value,
-        eventName: eventName,
-        placement: placement,
+  }}, '*');
+};
+
+$('#updateBtn').onclick = function() {
+  var eventName = $('#eventName').value.trim();
+  var placement = $('#placement').value.trim();
+  if (!eventName || !placement) { showStatus('eventName and placement are required.', true); return; }
+  parent.postMessage({ pluginMessage: {
+    type: 'update-event',
+    payload: {
+      nodeId: editingNodeId, index: editingIndex,
+      event: {
+        eventType: $('#eventType').value, eventName: eventName, placement: placement,
         description: $('#description').value.trim() || undefined,
         group: $('#group').value.trim() || undefined,
       }
-    }}, '*');
-  };
-
-  $('#updateBtn').onclick = function() {
-    var eventName = $('#eventName').value.trim();
-    var placement = $('#placement').value.trim();
-    if (!eventName || !placement) {
-      showStatus('eventName and placement are required.', true);
-      return;
     }
-    parent.postMessage({ pluginMessage: {
-      type: 'update-event',
-      payload: {
-        index: editingIndex,
-        event: {
-          eventType: $('#eventType').value,
-          eventName: eventName,
-          placement: placement,
-          description: $('#description').value.trim() || undefined,
-          group: $('#group').value.trim() || undefined,
-        }
-      }
-    }}, '*');
-    exitEditMode();
-  };
+  }}, '*');
+  exitEditMode();
+};
 
-  $('#deleteBtn').onclick = function() {
-    parent.postMessage({ pluginMessage: {
-      type: 'delete-event',
-      payload: { index: editingIndex }
-    }}, '*');
-    exitEditMode();
-  };
+$('#deleteBtn').onclick = function() {
+  parent.postMessage({ pluginMessage: {
+    type: 'delete-event', payload: { nodeId: editingNodeId, index: editingIndex }
+  }}, '*');
+  exitEditMode();
+};
 
-  $('#cancelEditBtn').onclick = function() { exitEditMode(); };
+$('#cancelEditBtn').onclick = function() { exitEditMode(); };
 
-  $('#exportBtn').onclick = function() {
-    parent.postMessage({ pluginMessage: { type: 'export-spec' }}, '*');
-  };
+$('#exportBtn').onclick = function() {
+  parent.postMessage({ pluginMessage: { type: 'export-spec' } }, '*');
+};
 
-  function enterEditMode(index, event) {
-    editingIndex = index;
-    $('#formTitle').textContent = 'Edit Event';
-    $('#eventType').value = event.eventType;
-    $('#eventName').value = event.eventName;
-    $('#placement').value = event.placement;
-    $('#description').value = event.description || '';
-    $('#group').value = event.group || '';
-    $('#addBtnRow').style.display = 'none';
-    $('#editBtnRow').style.display = 'flex';
-    highlightEditingItem(index);
-    // Switch to Add tab for editing
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-    document.querySelector('[data-tab="input"]').classList.add('active');
-    $('#tab-input').classList.add('active');
+function focusNode(nodeId) {
+  parent.postMessage({ pluginMessage: { type: 'focus-node', payload: { nodeId: nodeId } }}, '*');
+}
+
+function enterEditMode(nodeId, index, event) {
+  skipNextSelectionReset = true;
+  editingNodeId = nodeId;
+  editingIndex = index;
+  $('#formTitle').textContent = 'Edit Event';
+  $('#eventType').value = event.eventType;
+  $('#eventName').value = event.eventName;
+  $('#placement').value = event.placement;
+  $('#description').value = event.description || '';
+  $('#group').value = event.group || '';
+  $('#addBtnRow').style.display = 'none';
+  $('#editBtnRow').style.display = 'flex';
+  switchToTab('input');
+}
+
+function exitEditMode() {
+  editingNodeId = null;
+  editingIndex = -1;
+  $('#formTitle').textContent = 'Add Event';
+  $('#eventType').value = 'click';
+  $('#eventName').value = '';
+  $('#placement').value = '';
+  $('#description').value = '';
+  $('#group').value = '';
+  $('#addBtnRow').style.display = 'flex';
+  $('#editBtnRow').style.display = 'none';
+}
+
+function switchToTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelector('[data-tab="' + name + '"]').classList.add('active');
+  $('#tab-' + name).classList.add('active');
+}
+
+function renderAllEvents(groups) {
+  allGroups = groups;
+  var container = $('#allEventList');
+  var totalEvents = 0;
+
+  if (!groups || groups.length === 0) {
+    $('#totalBadge').textContent = '';
+    $('#totalCount').textContent = '';
+    container.innerHTML = '<div class="no-events">No events marked on this page yet</div>';
+    return;
   }
 
-  function exitEditMode() {
-    editingIndex = -1;
-    $('#formTitle').textContent = 'Add Event';
-    $('#eventType').value = 'click';
-    $('#eventName').value = '';
-    $('#placement').value = '';
-    $('#description').value = '';
-    $('#group').value = '';
-    $('#addBtnRow').style.display = 'flex';
-    $('#editBtnRow').style.display = 'none';
-    highlightEditingItem(-1);
-  }
+  groups.forEach(function(g) { totalEvents += g.events.length; });
+  $('#totalBadge').textContent = ' (' + totalEvents + ')';
+  $('#totalCount').textContent = totalEvents + ' events across ' + groups.length + ' layers';
 
-  function highlightEditingItem(index) {
-    document.querySelectorAll('.event-item').forEach(function(el, i) {
-      el.classList.toggle('editing', i === index);
-    });
-  }
-
-  function renderEventList(nodeName, events) {
-    currentEvents = events;
-    var container = $('#eventList');
-
-    if (!nodeName) {
-      $('#resultSelectionLabel').textContent = 'No layer selected';
-      $('#inputSelectionLabel').textContent = 'No layer selected';
-      $('#eventCountBadge').textContent = '';
-      container.innerHTML = '<div class="no-events">Select a layer to see its events</div>';
-      return;
-    }
-
-    $('#resultSelectionLabel').textContent = 'Layer: ' + nodeName;
-    $('#inputSelectionLabel').textContent = 'Layer: ' + nodeName;
-
-    if (events.length === 0) {
-      $('#eventCountBadge').textContent = '';
-      container.innerHTML = '<div class="no-events">No events on this layer</div>';
-      return;
-    }
-
-    $('#eventCountBadge').textContent = ' (' + events.length + ')';
-
-    container.innerHTML = events.map(function(ev, i) {
-      return '<div class="event-item" data-index="' + i + '">' +
+  container.innerHTML = groups.map(function(group) {
+    var eventsHtml = group.events.map(function(ev, i) {
+      return '<div class="event-item" data-node-id="' + group.nodeId + '" data-index="' + i + '">' +
         '<span class="event-badge ' + (ev.eventType === 'click' ? 'badge-click' : 'badge-view') + '">' + ev.eventType + '</span>' +
         '<div class="event-info">' +
           '<div class="event-name">' + escapeHtml(ev.eventName) + '</div>' +
@@ -318,42 +282,94 @@
       '</div>';
     }).join('');
 
-    container.querySelectorAll('.event-item').forEach(function(el) {
-      el.onclick = function() {
-        var idx = parseInt(el.dataset.index);
-        enterEditMode(idx, events[idx]);
-      };
-    });
+    return '<div class="layer-group">' +
+      '<div class="layer-header" data-node-id="' + group.nodeId + '">' +
+        '<span class="layer-icon">\u25B6</span> ' +
+        escapeHtml(group.nodeName) +
+        ' <span class="layer-count">(' + group.events.length + ')</span>' +
+      '</div>' +
+      eventsHtml +
+    '</div>';
+  }).join('');
+
+  container.querySelectorAll('.layer-header').forEach(function(el) {
+    el.onclick = function() { focusNode(el.dataset.nodeId); };
+  });
+
+  container.querySelectorAll('.event-item').forEach(function(el) {
+    el.onclick = function(e) {
+      e.stopPropagation();
+      var nodeId = el.dataset.nodeId;
+      var idx = parseInt(el.dataset.index);
+      var group = allGroups.find(function(g) { return g.nodeId === nodeId; });
+      if (group) {
+        focusNode(nodeId);
+        enterEditMode(nodeId, idx, group.events[idx]);
+      }
+    };
+  });
+}
+
+function showStatus(text, isError) {
+  $('#status').style.color = isError ? '#dc2626' : '#16a34a';
+  $('#status').textContent = text;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+onmessage = function(event) {
+  var msg = event.data.pluginMessage;
+  if (!msg) return;
+
+  if (msg.type === 'saved') {
+    showStatus('Saved to "' + msg.nodeName + '"', false);
+    $('#eventName').value = '';
   }
 
-  function showStatus(text, isError) {
-    $('#status').style.color = isError ? '#dc2626' : '#16a34a';
-    $('#status').textContent = text;
+  if (msg.type === 'selection-events') {
+    if (msg.nodeName) {
+      $('#inputSelectionLabel').textContent = 'Layer: ' + msg.nodeName;
+    } else {
+      $('#inputSelectionLabel').textContent = 'No layer selected';
+    }
+    if (skipNextSelectionReset) {
+      skipNextSelectionReset = false;
+      return;
+    }
+    if (editingIndex >= 0) exitEditMode();
   }
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if (msg.type === 'all-events') {
+    renderAllEvents(msg.groups);
   }
 
-  onmessage = function(event) {
-    var msg = event.data.pluginMessage;
-    if (!msg) return;
-
-    if (msg.type === 'saved') {
-      showStatus('Saved to "' + msg.nodeName + '"', false);
-      $('#eventName').value = '';
-    }
-
-    if (msg.type === 'selection-events') {
-      renderEventList(msg.nodeName, msg.events);
-      if (editingIndex >= 0) exitEditMode();
-    }
-
-    if (msg.type === 'spec-exported') {
-      var json = JSON.stringify(msg.spec, null, 2);
-      $('#exportContent').innerHTML = '<pre class="export-area">' + escapeHtml(json) + '</pre>';
-    }
-  };
+  if (msg.type === 'spec-exported') {
+    var json = JSON.stringify(msg.spec, null, 2);
+    $('#exportContent').innerHTML =
+      '<div class="export-wrapper">' +
+        '<button class="copy-btn" id="copyBtn">Copy</button>' +
+        '<pre class="export-area">' + escapeHtml(json) + '</pre>' +
+      '</div>';
+    $('#copyBtn').onclick = function() {
+      var ta = document.createElement('textarea');
+      ta.value = json;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      $('#copyBtn').textContent = 'Copied!';
+      $('#copyBtn').classList.add('copied');
+      setTimeout(function() {
+        $('#copyBtn').textContent = 'Copy';
+        $('#copyBtn').classList.remove('copied');
+      }, 1500);
+    };
+  }
+};
 </script>
 </body>
 </html>

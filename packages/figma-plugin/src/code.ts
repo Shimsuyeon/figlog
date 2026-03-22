@@ -8,6 +8,12 @@ interface LogEventData {
   group?: string;
 }
 
+interface NodeEventGroup {
+  nodeId: string;
+  nodeName: string;
+  events: LogEventData[];
+}
+
 figma.showUI(__html__, { width: 420, height: 640 });
 
 figma.on("selectionchange", () => {
@@ -31,40 +37,55 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
     figma.notify(`Event "${newEvent.eventName}" saved to ${node.name}`);
     figma.ui.postMessage({ type: "saved", nodeName: node.name });
     sendSelectionEvents();
+    sendAllEvents();
   }
 
   if (msg.type === "update-event") {
-    const { index, event } = msg.payload as { index: number; event: LogEventData };
-    const selection = figma.currentPage.selection;
-    if (selection.length === 0) return;
+    const { nodeId, index, event } = msg.payload as {
+      nodeId: string;
+      index: number;
+      event: LogEventData;
+    };
+    const node = figma.getNodeById(nodeId) as SceneNode | null;
+    if (!node) return;
 
-    const node = selection[0];
     const events = getEvents(node);
     if (index >= 0 && index < events.length) {
       events[index] = event;
       node.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(events));
       figma.notify(`Event "${event.eventName}" updated`);
       sendSelectionEvents();
+      sendAllEvents();
     }
   }
 
   if (msg.type === "delete-event") {
-    const { index } = msg.payload as { index: number };
-    const selection = figma.currentPage.selection;
-    if (selection.length === 0) return;
+    const { nodeId, index } = msg.payload as { nodeId: string; index: number };
+    const node = figma.getNodeById(nodeId) as SceneNode | null;
+    if (!node) return;
 
-    const node = selection[0];
     const events = getEvents(node);
     if (index >= 0 && index < events.length) {
       const removed = events.splice(index, 1)[0];
       node.setPluginData(PLUGIN_DATA_KEY, JSON.stringify(events));
       figma.notify(`Event "${removed.eventName}" deleted`);
       sendSelectionEvents();
+      sendAllEvents();
+    }
+  }
+
+  if (msg.type === "focus-node") {
+    const { nodeId } = msg.payload as { nodeId: string };
+    const node = figma.getNodeById(nodeId) as SceneNode | null;
+    if (node) {
+      figma.currentPage.selection = [node];
+      figma.viewport.scrollAndZoomIntoView([node]);
     }
   }
 
   if (msg.type === "request-selection-events") {
     sendSelectionEvents();
+    sendAllEvents();
   }
 
   if (msg.type === "export-spec") {
@@ -80,12 +101,40 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
 function sendSelectionEvents() {
   const selection = figma.currentPage.selection;
   if (selection.length === 0) {
-    figma.ui.postMessage({ type: "selection-events", nodeName: null, events: [] });
+    figma.ui.postMessage({
+      type: "selection-events",
+      nodeName: null,
+      nodeId: null,
+      events: [],
+    });
     return;
   }
   const node = selection[0];
   const events = getEvents(node);
-  figma.ui.postMessage({ type: "selection-events", nodeName: node.name, events });
+  figma.ui.postMessage({
+    type: "selection-events",
+    nodeName: node.name,
+    nodeId: node.id,
+    events,
+  });
+}
+
+function sendAllEvents() {
+  const groups: NodeEventGroup[] = [];
+  figma.currentPage.findAll((node) => {
+    const raw = node.getPluginData(PLUGIN_DATA_KEY);
+    if (!raw) return false;
+    try {
+      const events: LogEventData[] = JSON.parse(raw);
+      if (events.length > 0) {
+        groups.push({ nodeId: node.id, nodeName: node.name, events });
+      }
+    } catch (_) {
+      /* ignore malformed data */
+    }
+    return false;
+  });
+  figma.ui.postMessage({ type: "all-events", groups });
 }
 
 function getEvents(node: SceneNode): LogEventData[] {
@@ -102,7 +151,11 @@ function buildSpec() {
   const page = figma.currentPage;
   const screenMap = new Map<
     string,
-    { name: string; placement: string; events: Omit<LogEventData, "placement" | "group">[] }
+    {
+      name: string;
+      placement: string;
+      events: Omit<LogEventData, "placement" | "group">[];
+    }
   >();
 
   page.findAll((node) => {
