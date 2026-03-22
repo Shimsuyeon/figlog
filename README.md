@@ -108,6 +108,8 @@ function App() {
 
 ## Figma 플러그인
 
+> [Figma Community에서 설치](https://www.figma.com/community/plugin/1617597676660123564)
+
 DA가 Figma 디자인 파일에서 직접 로깅 포인트를 마킹하고 관리할 수 있는 플러그인입니다.
 
 ### 주요 기능

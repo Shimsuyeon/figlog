@@ -108,6 +108,8 @@ function App() {
 
 ## Figma Plugin
 
+> [Install from Figma Community](https://www.figma.com/community/plugin/1617597676660123564)
+
 A plugin that allows DAs to mark and manage logging points directly in Figma design files.
 
 ### Key Features
