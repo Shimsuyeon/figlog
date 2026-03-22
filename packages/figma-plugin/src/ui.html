@@ -127,6 +127,9 @@ button {
   <label>설명 <span class="optional">(선택)</span></label>
   <input id="description" placeholder="한국어 메모" />
 
+  <label>Action Type <span class="optional">(선택)</span></label>
+  <input id="actionType" placeholder="액션 타입 (시트 export용)" />
+
   <label>구분 <span class="optional">(선택)</span></label>
   <input id="group" placeholder="그룹 라벨 (export 정리용)" />
 
@@ -142,6 +145,13 @@ button {
 </div>
 
 <div class="tab-panel" id="tab-result">
+  <div id="fileKeySection" style="margin-bottom:12px;">
+    <div style="display:flex;gap:6px;align-items:center;">
+      <input id="fileUrlInput" placeholder="Figma 파일 URL 붙여넣기 (최초 1회)" style="flex:1;font-size:11px;padding:5px 8px;" />
+      <button class="btn-secondary" id="setFileKeyBtn" style="flex:none;padding:5px 10px;font-size:11px;">설정</button>
+    </div>
+    <div id="fileKeyStatus" style="font-size:10px;color:#16a34a;margin-top:4px;"></div>
+  </div>
   <div class="total-count" id="totalCount"></div>
   <div id="allEventList">
     <div class="no-events">No events marked on this page yet</div>
@@ -149,6 +159,7 @@ button {
   <hr class="divider" />
   <div class="btn-row">
     <button class="btn-primary" id="exportBtn">Export JSON</button>
+    <button class="btn-secondary" id="copySheetBtn">Copy for Sheet</button>
   </div>
   <div id="exportContent"></div>
 </div>
@@ -159,6 +170,7 @@ var editingNodeId = null;
 var editingIndex = -1;
 var skipNextSelectionReset = false;
 var allGroups = [];
+var fileKey = '';
 
 document.querySelectorAll('.tab').forEach(function(tab) {
   tab.onclick = function() {
@@ -181,6 +193,7 @@ $('#saveBtn').onclick = function() {
       eventType: $('#eventType').value, eventName: eventName, placement: placement,
       description: $('#description').value.trim() || undefined,
       group: $('#group').value.trim() || undefined,
+      actionType: $('#actionType').value.trim() || undefined,
     }
   }}, '*');
 };
@@ -197,6 +210,7 @@ $('#updateBtn').onclick = function() {
         eventType: $('#eventType').value, eventName: eventName, placement: placement,
         description: $('#description').value.trim() || undefined,
         group: $('#group').value.trim() || undefined,
+        actionType: $('#actionType').value.trim() || undefined,
       }
     }
   }}, '*');
@@ -216,6 +230,60 @@ $('#exportBtn').onclick = function() {
   parent.postMessage({ pluginMessage: { type: 'export-spec' } }, '*');
 };
 
+$('#setFileKeyBtn').onclick = function() {
+  var url = $('#fileUrlInput').value.trim();
+  var match = url.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
+  if (!match) {
+    $('#fileKeyStatus').style.color = '#dc2626';
+    $('#fileKeyStatus').textContent = 'Invalid Figma URL';
+    return;
+  }
+  var fk = match[1];
+  parent.postMessage({ pluginMessage: { type: 'set-file-key', payload: { fileKey: fk } }}, '*');
+};
+
+$('#copySheetBtn').onclick = function() {
+  if (!allGroups || allGroups.length === 0) {
+    showStatus('No events to copy.', true);
+    return;
+  }
+  var rows = [];
+  allGroups.forEach(function(group) {
+    var nodeUrl = fileKey
+      ? 'https://www.figma.com/design/' + fileKey + '?node-id=' + encodeURIComponent(group.nodeId)
+      : '';
+    group.events.forEach(function(ev) {
+      rows.push([
+        ev.group || '',
+        ev.eventType || '',
+        ev.placement || '',
+        ev.eventName || '',
+        ev.actionType || '',
+        ev.description || '',
+        nodeUrl
+      ].join('\t'));
+    });
+  });
+  var tsv = rows.join('\n');
+  var ta = document.createElement('textarea');
+  ta.value = tsv;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  var btn = $('#copySheetBtn');
+  btn.textContent = 'Copied!';
+  btn.style.background = '#dcfce7';
+  btn.style.color = '#16a34a';
+  setTimeout(function() {
+    btn.textContent = 'Copy for Sheet';
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 1500);
+};
+
 function focusNode(nodeId) {
   parent.postMessage({ pluginMessage: { type: 'focus-node', payload: { nodeId: nodeId } }}, '*');
 }
@@ -229,6 +297,7 @@ function enterEditMode(nodeId, index, event) {
   $('#eventName').value = event.eventName;
   $('#placement').value = event.placement;
   $('#description').value = event.description || '';
+  $('#actionType').value = event.actionType || '';
   $('#group').value = event.group || '';
   $('#addBtnRow').style.display = 'none';
   $('#editBtnRow').style.display = 'flex';
@@ -243,6 +312,7 @@ function exitEditMode() {
   $('#eventName').value = '';
   $('#placement').value = '';
   $('#description').value = '';
+  $('#actionType').value = '';
   $('#group').value = '';
   $('#addBtnRow').style.display = 'flex';
   $('#editBtnRow').style.display = 'none';
@@ -339,6 +409,13 @@ onmessage = function(event) {
       return;
     }
     if (editingIndex >= 0) exitEditMode();
+  }
+
+  if (msg.type === 'file-key') {
+    if (msg.fileKey) {
+      fileKey = msg.fileKey;
+      $('#fileKeySection').style.display = 'none';
+    }
   }
 
   if (msg.type === 'all-events') {

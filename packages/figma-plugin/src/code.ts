@@ -6,6 +6,7 @@ interface LogEventData {
   placement: string;
   description?: string;
   group?: string;
+  actionType?: string;
 }
 
 interface NodeEventGroup {
@@ -14,7 +15,23 @@ interface NodeEventGroup {
   events: LogEventData[];
 }
 
+const FILE_KEY_DATA = "figlog-file-key";
+
 figma.showUI(__html__, { width: 420, height: 640 });
+
+function getStoredFileKey(): string {
+  return figma.root.getPluginData(FILE_KEY_DATA) || "";
+}
+
+function sendFileKey() {
+  let fk = "";
+  try { fk = figma.fileKey ?? ""; } catch (_) { /* not available */ }
+  if (!fk) fk = getStoredFileKey();
+  if (fk) figma.root.setPluginData(FILE_KEY_DATA, fk);
+  figma.ui.postMessage({ type: "file-key", fileKey: fk });
+}
+
+sendFileKey();
 
 figma.on("selectionchange", () => {
   sendSelectionEvents();
@@ -81,6 +98,13 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
       figma.currentPage.selection = [node];
       figma.viewport.scrollAndZoomIntoView([node]);
     }
+  }
+
+  if (msg.type === "set-file-key") {
+    const { fileKey: fk } = msg.payload as { fileKey: string };
+    figma.root.setPluginData(FILE_KEY_DATA, fk);
+    figma.notify("File key saved: " + fk);
+    figma.ui.postMessage({ type: "file-key", fileKey: fk });
   }
 
   if (msg.type === "request-selection-events") {
@@ -176,6 +200,7 @@ function buildSpec() {
         eventType: event.eventType,
         eventName: event.eventName,
         description: event.description,
+        actionType: event.actionType,
       });
     }
     return false;
