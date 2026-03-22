@@ -4,6 +4,10 @@
 
 선언적 로깅 파이프라인: **Figma에서 로깅 포인트 마킹 → JSON 스펙 추출 → 빌드 타임 메타데이터 주입 → 런타임 자동 수집**
 
+<div align="center">
+  <img src="./docs/images/react-app.png" alt="FigLog 예시 앱" width="600" />
+</div>
+
 ## 동작 방식
 
 ```
@@ -12,6 +16,11 @@ DA가 Figma에서 로깅 포인트 마킹 → JSON 스펙 / 시트용 TSV 추출
   → Vite 플러그인이 빌드 타임에 컴포넌트/폴더 메타데이터 주입
   → useAutoLog 훅이 런타임에 click & view 이벤트 자동 수집
 ```
+
+<div align="center">
+  <img src="./docs/images/console-log.png" alt="런타임 로깅 콘솔 출력" width="600" />
+  <p><em>useAutoLog 훅의 런타임 이벤트 수집 결과</em></p>
+</div>
 
 ## 패키지 구조
 
@@ -99,6 +108,16 @@ function App() {
 ## Figma 플러그인
 
 DA가 Figma 디자인 파일에서 직접 로깅 포인트를 마킹하고 관리할 수 있는 플러그인입니다.
+
+<div align="center">
+  <img src="./docs/images/figma-add-tab.png" alt="Figma 플러그인 - 이벤트 입력" width="360" />
+  <img src="./docs/images/figma-result-tab.png" alt="Figma 플러그인 - 이벤트 목록" width="360" />
+</div>
+
+<div align="center">
+  <img src="./docs/images/sheet-paste.png" alt="시트 붙여넣기 결과" width="600" />
+  <p><em>Copy for Sheet → Google Sheets에 바로 붙여넣기</em></p>
+</div>
 
 ### 주요 기능
 

@@ -4,6 +4,10 @@
 
 End-to-end declarative logging pipeline: **Figma → JSON spec → build-time injection → runtime auto-collection**.
 
+<div align="center">
+  <img src="./docs/images/react-app.png" alt="FigLog example app" width="600" />
+</div>
+
 ## How It Works
 
 ```
@@ -12,6 +16,11 @@ DA marks logging points in Figma → JSON spec exported
   → Vite plugin injects component/folder metadata at build time
   → useAutoLog hook auto-collects click & view events at runtime
 ```
+
+<div align="center">
+  <img src="./docs/images/console-log.png" alt="Runtime logging console output" width="600" />
+  <p><em>Runtime event collection by the useAutoLog hook</em></p>
+</div>
 
 ## Packages
 
@@ -95,6 +104,18 @@ function App() {
 |---|---|---|---|
 | DA-defined | `data-log-id` present | `{action}{Domain}{Id}` | `clickOnlineShopAddToCart` |
 | Auto-generated | No `data-log-id` | `{folder}.{component}.{action}` | `shop.ProductList.click` |
+
+## Figma Plugin
+
+<div align="center">
+  <img src="./docs/images/figma-add-tab.png" alt="Figma plugin - event input" width="360" />
+  <img src="./docs/images/figma-result-tab.png" alt="Figma plugin - event list" width="360" />
+</div>
+
+<div align="center">
+  <img src="./docs/images/sheet-paste.png" alt="Sheet paste result" width="600" />
+  <p><em>Copy for Sheet → paste directly into Google Sheets</em></p>
+</div>
 
 ## Development
 
