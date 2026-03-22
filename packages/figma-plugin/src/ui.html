@@ -99,6 +99,15 @@ button {
 .copy-btn:hover { background: #f4f4f5; color: #333; }
 .copy-btn.copied { background: #dcfce7; color: #16a34a; border-color: #86efac; }
 .total-count { font-size: 11px; color: #999; margin-bottom: 8px; }
+.diff-section { margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 12px; }
+.diff-added { background: #f0fdf4; border: 1px solid #bbf7d0; }
+.diff-removed { background: #fef2f2; border: 1px solid #fecaca; }
+.diff-title { font-weight: 600; margin-bottom: 6px; font-size: 11px; }
+.diff-title.green { color: #16a34a; }
+.diff-title.red { color: #dc2626; }
+.diff-item { font-size: 11px; color: #555; padding: 2px 0; }
+.diff-none { margin-top: 12px; padding: 8px; background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 6px; font-size: 11px; color: #16a34a; text-align: center; }
 </style>
 </head>
 <body>
@@ -162,6 +171,7 @@ button {
     <button class="btn-secondary" id="copySheetBtn">Copy for Sheet</button>
   </div>
   <div id="exportContent"></div>
+  <div id="diffContent"></div>
 </div>
 
 <script>
@@ -247,6 +257,7 @@ $('#copySheetBtn').onclick = function() {
     showStatus('No events to copy.', true);
     return;
   }
+  parent.postMessage({ pluginMessage: { type: 'export-sheet' } }, '*');
   var rows = [];
   allGroups.forEach(function(group) {
     var nodeUrl = fileKey
@@ -389,6 +400,36 @@ function escapeHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function renderDiff(diff) {
+  var container = $('#diffContent');
+  if (!diff || diff.isFirstExport) {
+    container.innerHTML = '<div class="diff-none">스냅샷 저장됨 (다음 Export 시 변경사항을 비교합니다)</div>';
+    return;
+  }
+  if (!diff.hasChanges) {
+    container.innerHTML = '<div class="diff-none">이전 Export 대비 변경사항 없음</div>';
+    return;
+  }
+  var html = '';
+  if (diff.added.length > 0) {
+    html += '<div class="diff-section diff-added">';
+    html += '<div class="diff-title green">+ 추가됨 (' + diff.added.length + ')</div>';
+    diff.added.forEach(function(e) {
+      html += '<div class="diff-item">' + escapeHtml(e.eventName) + ' \u00b7 ' + escapeHtml(e.placement) + ' \u00b7 ' + escapeHtml(e.nodeName) + '</div>';
+    });
+    html += '</div>';
+  }
+  if (diff.removed.length > 0) {
+    html += '<div class="diff-section diff-removed">';
+    html += '<div class="diff-title red">\u2212 삭제됨 (' + diff.removed.length + ')</div>';
+    diff.removed.forEach(function(e) {
+      html += '<div class="diff-item">' + escapeHtml(e.eventName) + ' \u00b7 ' + escapeHtml(e.placement) + ' \u00b7 ' + escapeHtml(e.nodeName) + '</div>';
+    });
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
 onmessage = function(event) {
   var msg = event.data.pluginMessage;
   if (!msg) return;
@@ -445,6 +486,11 @@ onmessage = function(event) {
         $('#copyBtn').classList.remove('copied');
       }, 1500);
     };
+    if (msg.diff) renderDiff(msg.diff);
+  }
+
+  if (msg.type === 'sheet-diff') {
+    if (msg.diff) renderDiff(msg.diff);
   }
 };
 </script>

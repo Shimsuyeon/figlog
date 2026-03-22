@@ -16,6 +16,22 @@ interface NodeEventGroup {
 }
 
 const FILE_KEY_DATA = "figlog-file-key";
+const SNAPSHOT_KEY = "figlog-snapshot";
+
+interface SnapshotEntry {
+  eventName: string;
+  eventType: string;
+  placement: string;
+  nodeId: string;
+  nodeName: string;
+}
+
+interface DiffResult {
+  added: SnapshotEntry[];
+  removed: SnapshotEntry[];
+  hasChanges: boolean;
+  isFirstExport: boolean;
+}
 
 figma.showUI(__html__, { width: 420, height: 640 });
 
@@ -114,7 +130,19 @@ figma.ui.onmessage = (msg: { type: string; payload?: unknown }) => {
 
   if (msg.type === "export-spec") {
     const spec = buildSpec();
-    figma.ui.postMessage({ type: "spec-exported", spec });
+    const curr = collectSnapshot();
+    const prev = loadSnapshot();
+    const diff = computeDiff(prev, curr);
+    saveSnapshot(curr);
+    figma.ui.postMessage({ type: "spec-exported", spec, diff });
+  }
+
+  if (msg.type === "export-sheet") {
+    const curr = collectSnapshot();
+    const prev = loadSnapshot();
+    const diff = computeDiff(prev, curr);
+    saveSnapshot(curr);
+    figma.ui.postMessage({ type: "sheet-diff", diff });
   }
 
   if (msg.type === "close") {
@@ -169,6 +197,54 @@ function getEvents(node: SceneNode): LogEventData[] {
   } catch (_) {
     return [];
   }
+}
+
+function collectSnapshot(): SnapshotEntry[] {
+  const entries: SnapshotEntry[] = [];
+  figma.currentPage.findAll((node) => {
+    const raw = node.getPluginData(PLUGIN_DATA_KEY);
+    if (!raw) return false;
+    try {
+      const events: LogEventData[] = JSON.parse(raw);
+      for (const ev of events) {
+        entries.push({
+          eventName: ev.eventName,
+          eventType: ev.eventType,
+          placement: ev.placement,
+          nodeId: node.id,
+          nodeName: node.name,
+        });
+      }
+    } catch (_) { /* ignore */ }
+    return false;
+  });
+  return entries;
+}
+
+function computeDiff(prev: SnapshotEntry[], curr: SnapshotEntry[]): DiffResult {
+  const toKey = (e: SnapshotEntry) => `${e.eventName}::${e.placement}::${e.nodeId}`;
+  const prevSet = new Set(prev.map(toKey));
+  const currSet = new Set(curr.map(toKey));
+
+  const added = curr.filter((e) => !prevSet.has(toKey(e)));
+  const removed = prev.filter((e) => !currSet.has(toKey(e)));
+
+  return {
+    added,
+    removed,
+    hasChanges: added.length > 0 || removed.length > 0,
+    isFirstExport: prev.length === 0,
+  };
+}
+
+function saveSnapshot(entries: SnapshotEntry[]) {
+  figma.root.setPluginData(SNAPSHOT_KEY, JSON.stringify(entries));
+}
+
+function loadSnapshot(): SnapshotEntry[] {
+  const raw = figma.root.getPluginData(SNAPSHOT_KEY);
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch (_) { return []; }
 }
 
 function buildSpec() {
